@@ -8,6 +8,7 @@ library(data.table) #Now you can reload the library and shouldn't get an error
 #We create an object to hold the url. This can be done in one line, but this helps see what's happening.
 url<-"https://data.baltimorecity.gov/api/views/dz54-2aru/rows.csv?accessType=DOWNLOAD"
 
+#### Importing Files ####
 #Now download the file
 download.file(url, destfile = "cameras.csv")
 list.files()
@@ -106,3 +107,61 @@ list.files()
   #What's Missing?
   table(ex_sub1$recommend)  
   
+#### Data Table ####
+  
+  #Let's look at the system read times to see why one may want to use data.table and not read.csv
+    big_df <- data.frame(x=rnorm(1E6), y=rnorm(1E6)) 
+    file <- tempfile() 
+    write.table(big_df, file=file, row.names=FALSE, col.names=TRUE, 
+              sep="\t", quote=FALSE) 
+    system.time(fread(file)) 
+    system.time(read.csv(file))
+  
+  #Let's create some data to show the functionality of data.table
+  #Set size of dataset
+    size<-20000
+    
+    Years<-sample(c(2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019), size, replace=T)
+    Years<-sample(c("2011", "2012", "2013", "2014", 2015, 2016, 2017, 2018, 2019), size, replace=T)
+    
+    Months<-sample(c("January", "February", "March", "April", "May", "June", "July",
+                     "August", "September", "October", "November", "December"), size, replace=T)
+    Orgs<-sample(c("Tri West", "Tri South", "Texas Best", "Helping Here", "Silver and Black Give Back",
+                   "Mike's Tots", "Purple Cross"), size, replace=T)
+    Region<-sample(c("South", "West", "North", "East"), size, replace=T)
+    Cost<-sample(100:100000, size, replace=T)
+  
+    df<-data.frame(Orgs=Orgs, Months=Months, Region=Region, Years=Years, Cost=Cost)
+    dt<-data.table(Orgs=Orgs, Months=Months, Region=Region, Years=Years, Cost=Cost)
+  
+  #Subset the data table 
+    dtm<-dt[dt$Months=="March",]
+    
+    #Rows
+    dt[c(2,3)]
+    #Columns
+    dt[,c(2,3)]
+    
+    #Calculating values for variables with expressions
+    sumstats<-dt[,list(mean(Cost), sum(Cost))]
+    
+  #Creating New Columns
+    dt[,newvar:=Cost/2]
+    summary(dt$newvar)    
+    head(dt)    
+    
+    dplyr::mutate(dt, newvar_dplyr=Cost/2)
+    
+  #Creating Columns with multiple operations
+    dt[,multi:= {tmp <- (Cost+newvar); log2(tmp+5)}] 
+    #summary(dt$multi)    
+    #head(dt)
+    
+  #If/Else like operations
+    dt[,val:=Cost>3000]
+    table(dt$val)    
+    
+#### Summarise Data with Dplyr ####
+    dplyr::summarise(dt, avg=mean(Cost))
+    dplyr::summarise_each(dt[,c(4:6)], funs(mean))
+    
