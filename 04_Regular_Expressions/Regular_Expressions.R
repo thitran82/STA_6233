@@ -88,3 +88,9 @@ year<-"1888 is the longest year in Roman numerals: MDCCCLXXXVIII"
   str_view(year, "CC*") #0 OR MORE
   str_view(year, "DCL*")
   
+  number <- "101000000000100"
+  #greedy
+  regmatches(number, gregexpr(pattern = "1.*1",text = number))
+  #non greedy
+  regmatches(number, gregexpr(pattern = "1.?1",text = number))
+  
