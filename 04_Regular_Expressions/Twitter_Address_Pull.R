@@ -81,7 +81,9 @@ add_geo_all_list<-list() #Create Empty dataset to bind all addresses to.
 for(j in 1:1){
   tic(paste0("Process #", j))
   
-  tweets_main<-fread(paste0("A:/Users/Matthew/Desktop/Twitter_Data/tweets_08_28_Matt.csv"), fill=T, blank.lines.skip = T)
+  download.file("https://github.com/mattdemography/STA_6233/blob/master/Data/tweets_08_28_Matt.zip?raw=true", mode="wb", destfile = "./tweets.zip")
+  unzip("./tweets.zip", unzip="internal")
+  tweets_main<-fread(paste0("./tweets_08_28_Matt.csv"), fill=T, blank.lines.skip = T)
   #tweets_main<-read.csv(paste0("~/social_media_cat_system/Harvey_Modeling_", j, ".csv"))
   
   tweets_main<-as.data.frame(tweets_main)
