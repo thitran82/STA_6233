@@ -7,6 +7,7 @@ You will find all course materials in this github repository. We are using githu
 Please use the following link each week during regular class time to join.
 
 Topic: Advanced R Class
+
 Time: Mar 27, 2020 05:00 PM Central Time (US and Canada)
         Every week on Fri, until May 1, 2020, 6 occurrence(s)
         Mar 27, 2020 05:00 PM
@@ -15,6 +16,7 @@ Time: Mar 27, 2020 05:00 PM Central Time (US and Canada)
         Apr 17, 2020 05:00 PM
         Apr 24, 2020 05:00 PM
         May 1, 2020 05:00 PM
+
 Please download and import the following iCalendar (.ics) files to your calendar system.
 Weekly: https://us04web.zoom.us/meeting/tZcpdeiqqjgpdV8p5Idjyp1M4X9bi7Rp9w/ics?icsToken=98tyKuGrqjkrGNCWs13tUbYtE4X8b_HmknV48rMItRvvGjACT1fOb-BLZYBvSc-B
 
