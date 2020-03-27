@@ -19,8 +19,11 @@ system("git pull https://github.com/mattdemography/STA_6233")
 #To do this you will need to tell RStudio and Github that this is your account and you have permissions to make changes to the repository.
 #To do this we use a SSH key. These keys should not be posted anywhere and you should only call them when needed as they give access to your system and your git account.
 
-#       ssh-keygen -t rsa -b 4096 -C "mjmpoetry@gmail.com"
-#       ~/.ssh/id_rsa.pub
-# C:\Users\Matthew/.ssh/id_rsa.pub
+system("git config --global user.email \"mjmpoetry@gmail.com\"")  #Add your github email
+system("git config --global user.name \"mattdemography\"")        #Add your github username
+system("git config --list")                                       #Check your settings
+"ssh-keygen -t rsa -C mjmpoetry@gmail.com"                        #Generate your Keys
+"cat ~/.ssh/id_rsa.pub"                                           #Copy SSH public key to place in github
 
+#go to Tools -> Global options -> Git SVN -> View public key and copy the key to your Github account setting (Edit profile / SSH keys / Add SSH key).
 #https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
