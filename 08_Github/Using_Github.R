@@ -30,3 +30,5 @@ system("git config --list")                                       #Check your se
 
 #go to Tools -> Global options -> Git SVN -> View public key and copy the key to your Github account setting (Edit profile / SSH keys / Add SSH key).
 #https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+
+#Now we can pull and push our own repositories to keep up with verison control.
