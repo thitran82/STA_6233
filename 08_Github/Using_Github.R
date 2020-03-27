@@ -13,5 +13,14 @@
 #In order to make sure you are seeing the newest versions of items you will use:
 system("git pull https://github.com/mattdemography/STA_6233")
 
+#Note that the system() function sends items to the Terminal. You can type in that line into a terminal without the system() wrapper and get the same result.
+
+#Now What if you don't just want to bring in other repositories, but instead use your own so that you can quickly save code when needed?
+#To do this you will need to tell RStudio and Github that this is your account and you have permissions to make changes to the repository.
+#To do this we use a SSH key. These keys should not be posted anywhere and you should only call them when needed as they give access to your system and your git account.
+
+#       ssh-keygen -t rsa -b 4096 -C "mjmpoetry@gmail.com"
+#       ~/.ssh/id_rsa.pub
+# C:\Users\Matthew/.ssh/id_rsa.pub
 
 #https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
