@@ -8,6 +8,9 @@
 #First some basics. Pull commands allow us to pull down code from a public Git repository. The easiest way to do this is create an R Project
 #and make it link to the respository you want to bring in. In this case it is: https://github.com/mattdemography/STA_6233
 
+#See if you have git installed - you should
+#Type "which git" into the Terminal. If you seen an error then navigate to: "https://happygitwithr.com/install-git.html"
+
 #Navigate to File -> New Project -> Version Control -> Git -> and paste the link above into the gitrepo field.
 #Now you will have all of the course materials in an R project. This project is static - it will not change as new items are put into the folder.
 #In order to make sure you are seeing the newest versions of items you will use:
