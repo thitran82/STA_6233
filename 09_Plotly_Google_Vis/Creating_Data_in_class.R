@@ -1,33 +1,7 @@
----
-title: "Example Interactive Graphs"
-author: "Matthew Martinez"
-date: "4/3/2020"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
 library(googleVis)
 library(tidyr)
-library(gridExtra)
-library(dplyr)
-library(plyr)
-library(stringr)
-library(data.table)
-library(ggplot2)
+library(dplyr) 
 library(scales)
-library(plotly)
-```
-
-
-## Transitions Analysis
-
-I can discuss what this study is about **here**. Including formating and working with R Markdown within this example. [Click here for RStudio](www.rstudio.com)
-
-Next, I discuss the results of this assessment.
-
-
-```{r data_clean, echo=FALSE, include=FALSE}
 
 #Bring in Data
 all_cohorts<-read.csv("https://raw.githubusercontent.com/mattdemography/STA_6233/master/Data/all_cohorts.csv")
@@ -104,42 +78,48 @@ c<-count$Total
     ifelse(count_l$cohort=="17-Aug", 8, ifelse(count_l$cohort=="17-Sep", 9, ifelse(count_l$cohort=="17-Oct", 10, ifelse(count_l$cohort=="17-Nov", 11,
     ifelse(count_l$cohort=="17-Dec", 12, NA))))))))))))
 
-#Grab Only the 6th month
-  six<-count_l[61:72,c(1,6)]
-  max<-subset(six, six$Percent_Still_Employee==max(six$Percent_Still_Employee))
-  min<-subset(six, six$Percent_Still_Employee==min(six$Percent_Still_Employee))
+  #count_l$cohort<-factor(count_l$cohort, levels=count_l$cohort[order(count_l$fl)])
   
-```
+#Create Visualizations  
+myStateSettings_time<-'
+  {"yZoomedIn":false,"time":"101","sizeOption":"_UNISIZE","orderedByY":false,"yZoomedDataMax":4000,"nonSelectedAlpha":0.4,"orderedByX":true,"iconKeySettings":[],
+  "uniColorForNonSelected":false,"yLambda":1,"yAxisOption":"3","xLambda":1,"showTrails":false,"xZoomedDataMax":12,"dimensions":{"iconDimensions":["dim0"]},
+  "yZoomedDataMin":0,"iconType":"VBAR","colorOption":"_UNIQUE_COLOR", "duration":{"multiplier":1,"timeUnit":"Y"},"playDuration":15088.88888888889,
+  "xAxisOption":"_ALPHABETICAL","xZoomedIn":false,"xZoomedDataMin":0}
+  '
+m_reg<-gvisMotionChart(count_l[1:132,c(1:7)], idvar="cohort", timevar = "Month")
+m_time<-gvisMotionChart(count_l[,c(1:2, 5:7)], idvar="cohort", timevar = "Month", options=list(state=myStateSettings_time))
+plot(m_reg)  
+plot(m_time)
 
-## Results
+#Grab Only the 6th month
+six<-count_l[61:72,c(1,6)]
+max<-subset(six, six$Percent_Still_Employee==max(six$Percent_Still_Employee))
+min<-subset(six, six$Percent_Still_Employee==min(six$Percent_Still_Employee))
 
-Figure #1 below displays the totals by month of newly added people. In total for 2017, there were `r as.numeric(tot_cnt)` people analyzed across 12 cohorts. The average across cohorts is `r round(all_sum1, 2)` and is displayed as a red dashed line in the figure below. The largest cohort is March17 at 3,291 new people and the smallest is November17 at 2,143. Any cohort that is above the average is displayed in darker blue and cohorts below average are displayed in lighter blue.
+line_t<-ggplot(data=count_l, aes(x=count_l$Month, y=count_l$Percent_Still_Employee, group=count_l$cohort)) + xlab("Month Number") +
+  ylab("Percent Still Employee") +  geom_line(aes(color=count_l$cohort)) + geom_vline(xintercept = 106, linetype="dashed") + theme_light() + 
+  scale_color_discrete(name="Legend") + scale_x_continuous(breaks=seq(101, 112,1)) + ggtitle("Percent Employee Remaining After Each Period by Cohort")
+plot(line_t)
+ggplotly(line_t)
 
-```{r visuals_1, echo=FALSE, include=TRUE, warning=FALSE}
 all_sum1<-mean(count$Total)
 bar1<-ggplot(data=count, aes(count$cohort, fill=count$cohort)) + geom_bar(aes(weight=count$Total)) +  
   scale_fill_manual(values=c("17-Apr"="lightcyan3", "17-Aug"="lightcyan4", "17-Dec"="lightcyan3", "17-Feb"="lightcyan4", "17-Jan"="lightcyan3",
                              "17-Jul"="lightcyan4", "17-Jun"="lightcyan3", "17-Mar"="lightcyan4", "17-May"="lightcyan3", "17-Nov"="lightcyan4",
                              "17-Oct"="lightcyan3", "17-Sep"="lightcyan4"), guide=F) + xlab("Cohort") + ylab("Total Employee") + theme_light() + 
   scale_y_continuous(limits=c(0, 3500), oob=rescale_none) + geom_hline(yintercept = all_sum1, linetype="dashed", colour="indianred3") + 
-  geom_text(aes(x=count$cohort, y=count$Total, label=count$Total), vjust=-1) + ggtitle("Total Number of Employees as Operators by Cohort")
+  geom_text(aes(x=count$cohort, y=count$Total, label=count$Total), vjust=-1) + ggtitle("Total Number of Employee as Operators by Cohort") 
+plot(bar1)
 
-ggplotly(bar1)
-```
-
-Figure #2 displays the average months that people stay as employees (as opposed to changing statuses) by cohort. The average across all 12 cohorts is `r round(all_sum2, 2)` and is displayed as a red dashed line in Figure #2. The highest average number of months that employees stayed in their current roles as 8.99 and occurred in the November17 and September17 cohorts. As above, any cohort that is below the global mean is displayed in light blue while any cohort above the mean is shown in dark blue.
-
-```{r visuals_2, echo=FALSE, include=TRUE, warning=FALSE}
-
-  #Create new dataset with just the summary statistics
+#Create new dataset with just the summary statistics
 sum_stats<-all_cohorts[,18:19] %>% group_by(cohort) %>% summarise_each(funs(mean(., na.rm = T), sd(., na.rm=T)))
 sum_stats$fl<-ifelse(sum_stats$cohort=="17-Jan", 1, ifelse(sum_stats$cohort=="17-Feb", 2, ifelse(sum_stats$cohort=="17-Mar", 3,
   ifelse(sum_stats$cohort=="17-Apr", 4, ifelse(sum_stats$cohort=="17-May", 5, ifelse(sum_stats$cohort=="17-Jun", 6, ifelse(sum_stats$cohort=="17-Jul", 7,
   ifelse(sum_stats$cohort=="17-Aug", 8, ifelse(sum_stats$cohort=="17-Sep", 9, ifelse(sum_stats$cohort=="17-Oct", 10, ifelse(sum_stats$cohort=="17-Nov", 11,
   ifelse(sum_stats$cohort=="17-Dec", 12, NA))))))))))))
 sum_stats$cohort<-factor(sum_stats$cohort, levels=sum_stats$cohort[order(sum_stats$fl)])
-#  all_sum2<-mean(all_cohorts$count)
-  
+
 all_sum2<-mean(all_cohorts$count)
 bar2<-ggplot(data=sum_stats, aes(sum_stats$cohort, fill=sum_stats$cohort)) + geom_bar(aes(weight=sum_stats$mean)) +  
   scale_fill_manual(values=c("17-Apr"="lightcyan3", "17-Aug"="lightcyan4", "17-Dec"="lightcyan3", "17-Feb"="lightcyan4", "17-Jan"="lightcyan3",
@@ -148,50 +128,14 @@ bar2<-ggplot(data=sum_stats, aes(sum_stats$cohort, fill=sum_stats$cohort)) + geo
   scale_y_continuous(limits=c(8.25,9.25), oob=rescale_none) + geom_hline(yintercept = all_sum2, linetype="dashed", colour="indianred3") + 
   geom_text(aes(x=sum_stats$cohort, y=sum_stats$mean, label=round(sum_stats$mean,2)), vjust=-1) + ggtitle("Average Months Employee Remain by Cohort") 
 plot(bar2)
-```
 
-Next we see Figure #3 which displays the percent of employees that remain over time. The month number on the x-axis corresponds to the month of observation for each cohort. For example, month number 102 is the second month for the Feb17 cohort which would be March17, but the second month for the July17 cohort is August17 and so on. This allows us to view trends over time per cohort. The dashed vertical line symbolizes the 6th month, or when employees should convert to full-time status according to policy rules. As one can see for all cohorts, at least 70% of employees reamin as part-time after 6 months. The `r max[,1]` cohort has the largest percentage of part-time employees remaining at `r max[,2]` and the `r min[,1]` cohort has the least part-time employees remaining at `r min[,2]`.
+myTheme<-ttheme_default(
+  core=list(fg_params=list(hjust=1, x=1),
+            bg_params=list(fill=c("cornflowerblue", "gray92"))),
+  colhead=list(fg_params=list(col="white"),
+               bg_params=list(fill="mediumpurple"))
+)
 
-```{r visuals_3, echo=FALSE, warning=FALSE}
+trans_table<-tableGrob(t[1:15,], rows=NULL, theme=myTheme, vp=NULL)
+plot(trans_table)
 
-  line_t<-ggplot(data=count_l, aes(x=count_l$Month, y=count_l$Percent_Still_Employee, group=count_l$cohort)) + xlab("Month Number") +
-    ylab("Percent Still Employee") +  geom_line(aes(color=count_l$cohort)) + geom_vline(xintercept = 106, linetype="dashed") + theme_light() + 
-    scale_color_discrete(name="Legend") + scale_x_continuous(breaks=seq(101, 112,1)) + ggtitle("Figure #3 Percent Employees Remaining After Each Period by Cohort")
-  plot(line_t)
-```
-
-I am providing Google Visualizations
-
-```{r visuals_4, echo=FALSE, warning=FALSE}
-#Create Google Visualizations  
-  myStateSettings_time<-'
-  {"yZoomedIn":false,"time":"101","sizeOption":"_UNISIZE","orderedByY":false,"yZoomedDataMax":4000,"nonSelectedAlpha":0.4,"orderedByX":true,"iconKeySettings":[],
-  "uniColorForNonSelected":false,"yLambda":1,"yAxisOption":"3","xLambda":1,"showTrails":false,"xZoomedDataMax":12,"dimensions":{"iconDimensions":["dim0"]},
-  "yZoomedDataMin":0,"iconType":"VBAR","colorOption":"_UNIQUE_COLOR", "duration":{"multiplier":1,"timeUnit":"Y"},"playDuration":15088.88888888889,
-  "xAxisOption":"_ALPHABETICAL","xZoomedIn":false,"xZoomedDataMin":0}
-  '
-  m_reg<-gvisMotionChart(count_l[1:132,c(1:8)], idvar="cohort", timevar = "Month")
-  m_time<-gvisMotionChart(count_l[,c(1:2, 5:7)], idvar="cohort", timevar = "Month", options=list(state=myStateSettings_time))
-  plot(m_reg)  
-  plot(m_time)
-  
-  
-```
-
-## Appendix
-
-I am providing the following table that displays the top 15 transitions made from the part-time status. As can be seen, the data contain some missing values ('NA'). This can potentially be an important factor when analyzing the data above. These NA's can mean one of two things, each with different affects on the analyses. The NAs could mean that the previous status is still in effect or they could mean that there was a transition but this status change was not correctly documented.
-
-```{r visuals_5, echo=FALSE, warning=FALSE}
-  myTheme<-ttheme_default(
-    core=list(fg_params=list(hjust=1, x=1),
-              bg_params=list(fill=c("cornflowerblue", "gray92"))),
-    colhead=list(fg_params=list(col="white"),
-                 bg_params=list(fill="mediumpurple"))
-  )
-  
-  trans_table<-tableGrob(t[1:15,], rows=NULL, theme=myTheme)
-  trans_table<-plot_ly(type="table",header=list(values=names(t)), cells=list(values=unname(t[1:15,]))) 
-
-  trans_table
-```
