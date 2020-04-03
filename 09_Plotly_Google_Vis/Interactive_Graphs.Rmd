@@ -1,5 +1,5 @@
 ---
-title: "Example_Interactive_Graphs"
+title: "Example Interactive Graphs"
 author: "Matthew Martinez"
 date: "4/3/2020"
 output: html_document
@@ -19,7 +19,7 @@ library(scales)
 library(plotly)
 ```
 
-##Transitions Analysis
+## Transitions Analysis
 
 I can discuss what this study is about **here**. Including formating and working with R Markdown within this example.
 
@@ -87,6 +87,10 @@ c<-count$Total
   count_l$Month<-with(count_l, ave(as.character(count_l$cohort), as.character(count_l$cohort), FUN=seq_along)) %>% as.numeric()
   count_l$Month<-count_l$Month + 100 #Adding 100 so that it remains in order as 1, 11, 12, 2 will be order without this
 
+  all_sum1<-mean(count$Total)
+  all_sum2<-mean(all_cohorts$count)
+  tot_cnt<-sum(count$Total)
+  
   #Reorder Factor Levels
   count$fl<-ifelse(count$cohort=="17-Jan", 1, ifelse(count$cohort=="17-Feb", 2, ifelse(count$cohort=="17-Mar", 3,
     ifelse(count$cohort=="17-Apr", 4, ifelse(count$cohort=="17-May", 5, ifelse(count$cohort=="17-Jun", 6, ifelse(count$cohort=="17-Jul", 7,
@@ -165,10 +169,10 @@ I am providing Google Visualizations
   "yZoomedDataMin":0,"iconType":"VBAR","colorOption":"_UNIQUE_COLOR", "duration":{"multiplier":1,"timeUnit":"Y"},"playDuration":15088.88888888889,
   "xAxisOption":"_ALPHABETICAL","xZoomedIn":false,"xZoomedDataMin":0}
   '
-  m_reg<-gvisMotionChart(count_l[1:132,c(1:4,7)], idvar="cohort", timevar = "Month", xvar = "Month")
+  m_reg<-gvisMotionChart(count_l[1:132,c(1:8)], idvar="cohort", timevar = "Month")
   m_time<-gvisMotionChart(count_l[,c(1:2, 5:7)], idvar="cohort", timevar = "Month", options=list(state=myStateSettings_time))
-  #plot(m_reg)  
-  #plot(m_time)
+  plot(m_reg)  
+  plot(m_time)
   
   
 ```
@@ -186,5 +190,7 @@ I am providing the following table that displays the top 15 transitions made fro
   )
   
   trans_table<-tableGrob(t[1:15,], rows=NULL, theme=myTheme)
-  plot(trans_table)
+  trans_table<-plot_ly(type="table",header=list(values=names(t)), cells=list(values=unname(t[1:15,]))) 
+
+  trans_table
 ```
