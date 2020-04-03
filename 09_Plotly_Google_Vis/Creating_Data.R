@@ -10,42 +10,15 @@ Month<-c("Dec16", "Jan17", "Feb17", "March17", "Apr17", "May17", "June17", "July
          "Jan18", "Feb18", "March18", "Apr18", "May18", "June18", "July18", "Aug18", "Sep18", "Oct18", "Nov18", "Dec18", "Jan19")
 cnts_trans<-data.frame(Month_1=numeric(), Month_2=numeric(), Month_3=numeric(), Month_4=numeric(), Month_5=numeric(), Month_6=numeric()
                        , Month_7=numeric(), Month_8=numeric(), Month_9=numeric(), Month_10=numeric(), Month_11=numeric(), Month_12=numeric(), cohort=character())
-all_cohorts_list<-list() #Create Empty dataset to bind all addresses to.
 
-#Read in Data
-for(a in 1:12){
-  f<-read.csv(file=paste0("~/Ad_hocs/Fiances/Base", a, ".csv"))
-  
-  #Create List of Variables to Include in Transitions
-  f$trans<-do.call(paste, as.data.frame(f[,4:16], stringsAsFactors=F))
-  f$trans_id<-id(f[c("trans")], drop=T)
-  f$trans_extract<-str_extract(f$trans, "^([1][5][ ])+")
-  f$count <- str_count(f$trans_extract, fixed(' '))
-  
-  #Create a Table for Keeping All Counts of Transitions
-  cnts<-data.frame(table(f$count)) %>% transpose()
-  cnts$cohort<-Month[a+1]
-  names(cnts)<-names(cnts_trans)
-  cnts<-cnts[2,]
-  cnts_trans<-rbind(cnts_trans, cnts)
-  
-  #Change Names of cap to generic months
-  names(f)[3]<-"first"
-  names(f)[4:15]<-names(cnts_trans)[1:12]
-  names(f)[16]<-"last"
-  f$cohort<-Month[a+1]
-  
-  all_cohorts_list[[a]]<-f
-}
-all_cohorts=do.call(rbind, all_cohorts_list)
-
-#write.csv(all_cohorts, "~/Ad_hocs/Fiances/all_cohorts.csv")
-#write.csv(cnts_trans, "~/Ad_hocs/Fiances/cohort_counts.csv")
+#Bring in Data
+all_cohorts<-read.csv("https://raw.githubusercontent.com/mattdemography/STA_6233/master/Data/all_cohorts.csv")
+count<-read.csv("https://raw.githubusercontent.com/mattdemography/STA_6233/master/Data/cohort_counts.csv")
 
 #Find All Possible Transitions
 #Make Changes to  
-caps<-names(all_cohorts[3:15])
-caps_l<-names(all_cohorts[4:16])
+caps<-names(all_cohorts[2:14])
+caps_l<-names(all_cohorts[3:15])
 j<-as.data.frame(table(all_cohorts$trans))
 
 #Label these transitions

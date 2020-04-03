@@ -18,11 +18,9 @@ library(ggplot2)
 library(scales)
 ```
 
-## Fiancé Transitions Analysis
+##Transitions Analysis
 
-Currently USAA adds fiancés to auto policies when they do not live in the members' household and are getting married within **6 months**. At present, there is no follow-up process completed for members who do not update this fiancé status after 6 months. This lack of process has potential to have impact on: 1) members' policy ratings, 2) USAA's financial impact by paying out unnecessary claims to operators who should not be listed on policies, and 3) member interactions with MSRs if someone is incorrectly listed on a policy. To understand the breadth of this impact, we first must grasp how many members fall into the category of having a fiancé listed on their policy longer than 6 months. The analyses presented here seeks to answer the latter. More specifically, the analyses determine how many members have a fiancé listed as an operator on auto policies and how long fiancés remain as operators once they are added.
-
-To answer these questions, I created a unique dataset that pulled information on fiancés who were newly added as operators for each month of 2017. Using 2017 as the base year allowed enough months to follow each cohort for one full year. That is, newly added fiancés in January 2017 are followed until January 2018 to see if their status has changed during that time. The same method is used for each month of 2017 with newly added fiancés in February 2017 followed until February 2018 and so on. This method is superior to a single cohort approach as it allows us to consider any differences in seasonality of engagements. That is, are summer engagements more likely to result in marriage sooner than spring or winter ones? If so, are they also more likely to update the fiancé status to spouse or otherwise? Questions such as this allow a more nuanced approached to the question at hand.
+I can discuss what this study is about **here**. Including formating and working with R Markdown within this example.
 
 Next, I discuss the results of this assessment.
 
@@ -63,9 +61,9 @@ d<-unique(d)
 
 #Create list to change to
 cap_num<-c("13", "15", "19", "21", "25", "31", "33", "37", "39", "42", "46", "47", "48", "49", "51", "73", "3", "4", "5", "6", "7")
-cap_name<-c("Friend ->", "Fiance ->",  "Ex-Spouse ->", "Unknown ->",  "Son/Daughter-In-Law ->", "Babysitter ->", "Cousin ->", "Widow/er ->", "Unknown ->", 
-            "Deceased-Spouse ->", "Ex-Fiance ->", "Caretaker ->", "Cohabitant ->", "Ex-Cohabitant ->", "Business-Partner ->", "Deceased-Cohabitant ->", 
-            "Spouse ->", "Child ->", "Step-Child ->", "Brother/Sister ->", "Bro/Sis-In-Law ->")
+cap_name<-c("Less Than Part-Time ->", "Part-Time ->",  "Ex-Employee ->", "Unknown ->",  "Temp-Employee ->", "Temp-Employee ->", "Intern ->", "Intern ->", "Unknown ->", 
+            "Deceased-Employee ->", "Ex-Employee ->", "Outsourced ->", "Cohabitant ->", "Ex-Temp ->", "Business-Partner ->", "Deceased-Temp ->", 
+            "Full-Time ->", "Unknown ->", "Ex-Intern ->", "Family ->", "Ex-Employee ->")
 #Create Loop
   j$name<-j$Var1
   for(s in 1:length(cap_num)){
@@ -133,7 +131,7 @@ for(k in 1:12){
 
 ## Results
 
-Figure #1 below displays the totals by month of newly added fiancés as operators to auto policies. In total for 2017, there were `r as.numeric(tot_cnt)` fiancés analyzed across 12 cohorts. The average across cohorts is `r round(all_sum1, 2)` and is displayed as a red dashed line in the figure below. The largest cohort is March17 at 3,291 new fiancés added as operators and the smallest is November17 at 2,143. Any cohort that is above the average is displayed in darker blue and cohorts below average are displayed in lighter blue.
+Figure #1 below displays the totals by month of newly added people. In total for 2017, there were `r as.numeric(tot_cnt)` people analyzed across 12 cohorts. The average across cohorts is `r round(all_sum1, 2)` and is displayed as a red dashed line in the figure below. The largest cohort is March17 at 3,291 new people and the smallest is November17 at 2,143. Any cohort that is above the average is displayed in darker blue and cohorts below average are displayed in lighter blue.
 
 ```{r visuals_1, echo=FALSE, include=TRUE, warning=FALSE}
 #  all_sum1<-mean(cnts_trans$Total)
@@ -146,7 +144,7 @@ Figure #1 below displays the totals by month of newly added fiancés as operator
   plot(bar1)
 ```
 
-Figure #2 displays the average months that fiancés stay as operators (as opposed to changing statuses) by cohort. The average across all 12 cohorts is `r round(all_sum2, 2)` and is displayed as a red dashed line in Figure #2. The highest average number of months that fiancés stayed on policies as 8.99 and occurred in the November17 and September17 cohorts. As above, any cohort that is below the global mean is displayed in light blue while any cohort above the mean is shown in dark blue.
+Figure #2 displays the average months that people stay as employees (as opposed to changing statuses) by cohort. The average across all 12 cohorts is `r round(all_sum2, 2)` and is displayed as a red dashed line in Figure #2. The highest average number of months that employees stayed in their current roles as 8.99 and occurred in the November17 and September17 cohorts. As above, any cohort that is below the global mean is displayed in light blue while any cohort above the mean is shown in dark blue.
 
 ```{r visuals_2, echo=FALSE, include=TRUE, warning=FALSE}
 
@@ -168,7 +166,7 @@ Figure #2 displays the average months that fiancés stay as operators (as oppose
   plot(bar2)
 ```
 
-Next we see Figure #3 which displays the percent of fiancés that remain over time. The month number on the x-axis corresponds to the month of observation for each cohort. For example, month number 102 is the second month for the Feb17 cohort which would be March17, but the second month for the July17 cohort is August17 and so on. This allows us to view trends over time per cohort. The dashed vertical line symbolizes the 6th month, or when fiancés should convert to a marriage status according to policy rules. As one can see for all cohorts, at least 70% of fiancés reamin as operators on polices after 6 months. The `r max[,1]` cohort has the largest percentage of fiancés remaining at `r max[,2]` and the `r min[,1]` cohort has the least fiancés remaining at `r min[,2]`.
+Next we see Figure #3 which displays the percent of employees that remain over time. The month number on the x-axis corresponds to the month of observation for each cohort. For example, month number 102 is the second month for the Feb17 cohort which would be March17, but the second month for the July17 cohort is August17 and so on. This allows us to view trends over time per cohort. The dashed vertical line symbolizes the 6th month, or when employees should convert to full-time status according to policy rules. As one can see for all cohorts, at least 70% of employees reamin as part-time after 6 months. The `r max[,1]` cohort has the largest percentage of part-time employees remaining at `r max[,2]` and the `r min[,1]` cohort has the least part-time employees remaining at `r min[,2]`.
 
 ```{r visuals_3, echo=FALSE, warning=FALSE}
 
@@ -198,7 +196,8 @@ I am providing Google Visualizations
 
 ## Appendix
 
-I am providing the following table that displays the top 15 transitions made from the fiancé status. As can be seen, the data contain some missing values ('NA'). This can potentially be an important factor when analyzing the data above. These NA's can mean one of two things, each with different affects on the analyses. The NAs could mean that the previous status is still in effect or they could mean that there was a transition but this status change was not correctly documented. The former would increase the average length in months that fiances remian as operators on policies while the former has little affect on the outcomes listed above. Further investigation into these missing data points needs to be conducted for a full understanding of this issue.
+I am providing the following table that displays the top 15 transitions made from the part-time status. As can be seen, the data contain some missing values ('NA'). This can potentially be an important factor when analyzing the data above. These NA's can mean one of two things, each with different affects on the analyses. The NAs could mean that the previous status is still in effect or they could mean that there was a transition but this status change was not correctly documented.
+
 ```{r visuals_5, echo=FALSE, warning=FALSE}
   myTheme<-ttheme_default(
     core=list(fg_params=list(hjust=1, x=1),
