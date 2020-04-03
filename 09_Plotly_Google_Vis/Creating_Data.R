@@ -99,16 +99,16 @@ min<-subset(six, six$Percent_Still_Employee==min(six$Percent_Still_Employee))
 
 line_t<-ggplot(data=count_l, aes(x=count_l$Month, y=count_l$Percent_Still_Employee, group=count_l$cohort)) + xlab("Month Number") +
   ylab("Percent Still Employee") +  geom_line(aes(color=count_l$cohort)) + geom_vline(xintercept = 106, linetype="dashed") + theme_light() + 
-  scale_color_discrete(name="Legend") + scale_x_continuous(breaks=seq(101, 112,1)) + ggtitle("Percent Fiancés Remaining After Each Period by Cohort")
+  scale_color_discrete(name="Legend") + scale_x_continuous(breaks=seq(101, 112,1)) + ggtitle("Percent Employee Remaining After Each Period by Cohort")
 plot(line_t)
 
 all_sum1<-mean(count$Total)
 bar1<-ggplot(data=count, aes(count$cohort, fill=count$cohort)) + geom_bar(aes(weight=count$Total)) +  
   scale_fill_manual(values=c("17-Apr"="lightcyan3", "17-Aug"="lightcyan4", "17-Dec"="lightcyan3", "17-Feb"="lightcyan4", "17-Jan"="lightcyan3",
                              "17-Jul"="lightcyan4", "17-Jun"="lightcyan3", "17-Mar"="lightcyan4", "17-May"="lightcyan3", "17-Nov"="lightcyan4",
-                             "17-Oct"="lightcyan3", "17-Sep"="lightcyan4"), guide=F) + xlab("Cohort") + ylab("Total Fiancés") + theme_light() + 
+                             "17-Oct"="lightcyan3", "17-Sep"="lightcyan4"), guide=F) + xlab("Cohort") + ylab("Total Employee") + theme_light() + 
   scale_y_continuous(limits=c(0, 3500), oob=rescale_none) + geom_hline(yintercept = all_sum1, linetype="dashed", colour="indianred3") + 
-  geom_text(aes(x=count$cohort, y=count$Total, label=count$Total), vjust=-1) + ggtitle("Total Number of Fiancés as Operators by Cohort") 
+  geom_text(aes(x=count$cohort, y=count$Total, label=count$Total), vjust=-1) + ggtitle("Total Number of Employee as Operators by Cohort") 
 plot(bar1)
 
 #Create new dataset with just the summary statistics
@@ -125,7 +125,7 @@ bar2<-ggplot(data=sum_stats, aes(sum_stats$cohort, fill=sum_stats$cohort)) + geo
                              "17-Jul"="lightcyan4", "17-Jun"="lightcyan3", "17-Mar"="lightcyan4", "17-May"="lightcyan3", "17-Nov"="lightcyan4",
                              "17-Oct"="lightcyan3", "17-Sep"="lightcyan4"), guide=F) + xlab("Cohort") + ylab("Average Months") + theme_light() + 
   scale_y_continuous(limits=c(8.25,9.25), oob=rescale_none) + geom_hline(yintercept = all_sum2, linetype="dashed", colour="indianred3") + 
-  geom_text(aes(x=sum_stats$cohort, y=sum_stats$mean, label=round(sum_stats$mean,2)), vjust=-1) + ggtitle("Average Months Fiancés Remain by Cohort") 
+  geom_text(aes(x=sum_stats$cohort, y=sum_stats$mean, label=round(sum_stats$mean,2)), vjust=-1) + ggtitle("Average Months Employee Remain by Cohort") 
 plot(bar2)
 
 myTheme<-ttheme_default(

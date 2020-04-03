@@ -16,6 +16,7 @@ library(stringr)
 library(data.table)
 library(ggplot2)
 library(scales)
+library(plotly)
 ```
 
 ##Transitions Analysis
@@ -110,14 +111,15 @@ c<-count$Total
 Figure #1 below displays the totals by month of newly added people. In total for 2017, there were `r as.numeric(tot_cnt)` people analyzed across 12 cohorts. The average across cohorts is `r round(all_sum1, 2)` and is displayed as a red dashed line in the figure below. The largest cohort is March17 at 3,291 new people and the smallest is November17 at 2,143. Any cohort that is above the average is displayed in darker blue and cohorts below average are displayed in lighter blue.
 
 ```{r visuals_1, echo=FALSE, include=TRUE, warning=FALSE}
-#  all_sum1<-mean(count$Total)
-  bar1<-ggplot(data=count, aes(count$cohort, fill=count$cohort)) + geom_bar(aes(weight=count$Total)) +  
-    scale_fill_manual(values=c("Apr17"="lightcyan4", "Aug17"="lightcyan4", "Dec17"="lightcyan3", "Feb17"="lightcyan4", "Jan17"="lightcyan4",
-                               "July17"="lightcyan4", "June17"="lightcyan4", "March17"="lightcyan4", "May17"="lightcyan3", "Nov17"="lightcyan3",
-                               "Oct17"="lightcyan3", "Sep17"="lightcyan3"), guide=F) + xlab("Cohort") + ylab("Total Fiancés") + theme_light() + 
-    scale_y_continuous(limits=c(0, 3500), oob=rescale_none) + geom_hline(yintercept = all_sum1, linetype="dashed", colour="indianred3") + 
-    geom_text(aes(x=count$cohort, y=count$Total, label=count$Total), vjust=-1) + ggtitle("Figure #1 - Total Number of Fiancés as Operators by Cohort") 
-  plot(bar1)
+all_sum1<-mean(count$Total)
+bar1<-ggplot(data=count, aes(count$cohort, fill=count$cohort)) + geom_bar(aes(weight=count$Total)) +  
+  scale_fill_manual(values=c("17-Apr"="lightcyan3", "17-Aug"="lightcyan4", "17-Dec"="lightcyan3", "17-Feb"="lightcyan4", "17-Jan"="lightcyan3",
+                             "17-Jul"="lightcyan4", "17-Jun"="lightcyan3", "17-Mar"="lightcyan4", "17-May"="lightcyan3", "17-Nov"="lightcyan4",
+                             "17-Oct"="lightcyan3", "17-Sep"="lightcyan4"), guide=F) + xlab("Cohort") + ylab("Total Employee") + theme_light() + 
+  scale_y_continuous(limits=c(0, 3500), oob=rescale_none) + geom_hline(yintercept = all_sum1, linetype="dashed", colour="indianred3") + 
+  geom_text(aes(x=count$cohort, y=count$Total, label=count$Total), vjust=-1) + ggtitle("Total Number of Employees as Operators by Cohort")
+
+ggplotly(bar1)
 ```
 
 Figure #2 displays the average months that people stay as employees (as opposed to changing statuses) by cohort. The average across all 12 cohorts is `r round(all_sum2, 2)` and is displayed as a red dashed line in Figure #2. The highest average number of months that employees stayed in their current roles as 8.99 and occurred in the November17 and September17 cohorts. As above, any cohort that is below the global mean is displayed in light blue while any cohort above the mean is shown in dark blue.
@@ -125,21 +127,22 @@ Figure #2 displays the average months that people stay as employees (as opposed 
 ```{r visuals_2, echo=FALSE, include=TRUE, warning=FALSE}
 
   #Create new dataset with just the summary statistics
-  sum_stats<-all_cohorts[,20:21] %>% group_by(cohort) %>% summarise_each(funs(mean(., na.rm = T), sd(., na.rm=T)))
-  sum_stats$fl<-ifelse(sum_stats$cohort=="Jan17", 1, ifelse(sum_stats$cohort=="Feb17", 2, ifelse(sum_stats$cohort=="March17", 3,
-  ifelse(sum_stats$cohort=="Apr17", 4, ifelse(sum_stats$cohort=="May17", 5, ifelse(sum_stats$cohort=="June17", 6, ifelse(sum_stats$cohort=="July17", 7,
-  ifelse(sum_stats$cohort=="Aug17", 8, ifelse(sum_stats$cohort=="Sep17", 9, ifelse(sum_stats$cohort=="Oct17", 10, ifelse(sum_stats$cohort=="Nov17", 11,
-  ifelse(sum_stats$cohort=="Dec17", 12, NA))))))))))))
-  sum_stats$cohort<-factor(sum_stats$cohort, levels=sum_stats$cohort[order(sum_stats$fl)])
+sum_stats<-all_cohorts[,18:19] %>% group_by(cohort) %>% summarise_each(funs(mean(., na.rm = T), sd(., na.rm=T)))
+sum_stats$fl<-ifelse(sum_stats$cohort=="17-Jan", 1, ifelse(sum_stats$cohort=="17-Feb", 2, ifelse(sum_stats$cohort=="17-Mar", 3,
+  ifelse(sum_stats$cohort=="17-Apr", 4, ifelse(sum_stats$cohort=="17-May", 5, ifelse(sum_stats$cohort=="17-Jun", 6, ifelse(sum_stats$cohort=="17-Jul", 7,
+  ifelse(sum_stats$cohort=="17-Aug", 8, ifelse(sum_stats$cohort=="17-Sep", 9, ifelse(sum_stats$cohort=="17-Oct", 10, ifelse(sum_stats$cohort=="17-Nov", 11,
+  ifelse(sum_stats$cohort=="17-Dec", 12, NA))))))))))))
+sum_stats$cohort<-factor(sum_stats$cohort, levels=sum_stats$cohort[order(sum_stats$fl)])
 #  all_sum2<-mean(all_cohorts$count)
   
-  bar2<-ggplot(data=sum_stats, aes(sum_stats$cohort, fill=sum_stats$cohort)) + geom_bar(aes(weight=sum_stats$mean)) +  
-    scale_fill_manual(values=c("Apr17"="lightcyan3", "Aug17"="lightcyan4", "Dec17"="lightcyan4", "Feb17"="lightcyan3", "Jan17"="lightcyan3",
-                               "July17"="lightcyan4", "June17"="lightcyan3", "March17"="lightcyan3", "May17"="lightcyan3", "Nov17"="lightcyan4",
-                               "Oct17"="lightcyan4", "Sep17"="lightcyan4"), guide=F) + xlab("Cohort") + ylab("Average Months") + theme_light() + 
-    scale_y_continuous(limits=c(8.25,9.25), oob=rescale_none) + geom_hline(yintercept = all_sum2, linetype="dashed", colour="indianred3") + 
-    geom_text(aes(x=sum_stats$cohort, y=sum_stats$mean, label=round(sum_stats$mean,2)), vjust=-1) + ggtitle("Figure #2 - Average Months Fiancés Remain by Cohort") 
-  plot(bar2)
+all_sum2<-mean(all_cohorts$count)
+bar2<-ggplot(data=sum_stats, aes(sum_stats$cohort, fill=sum_stats$cohort)) + geom_bar(aes(weight=sum_stats$mean)) +  
+  scale_fill_manual(values=c("17-Apr"="lightcyan3", "17-Aug"="lightcyan4", "17-Dec"="lightcyan3", "17-Feb"="lightcyan4", "17-Jan"="lightcyan3",
+                             "17-Jul"="lightcyan4", "17-Jun"="lightcyan3", "17-Mar"="lightcyan4", "17-May"="lightcyan3", "17-Nov"="lightcyan4",
+                             "17-Oct"="lightcyan3", "17-Sep"="lightcyan4"), guide=F) + xlab("Cohort") + ylab("Average Months") + theme_light() + 
+  scale_y_continuous(limits=c(8.25,9.25), oob=rescale_none) + geom_hline(yintercept = all_sum2, linetype="dashed", colour="indianred3") + 
+  geom_text(aes(x=sum_stats$cohort, y=sum_stats$mean, label=round(sum_stats$mean,2)), vjust=-1) + ggtitle("Average Months Employee Remain by Cohort") 
+plot(bar2)
 ```
 
 Next we see Figure #3 which displays the percent of employees that remain over time. The month number on the x-axis corresponds to the month of observation for each cohort. For example, month number 102 is the second month for the Feb17 cohort which would be March17, but the second month for the July17 cohort is August17 and so on. This allows us to view trends over time per cohort. The dashed vertical line symbolizes the 6th month, or when employees should convert to full-time status according to policy rules. As one can see for all cohorts, at least 70% of employees reamin as part-time after 6 months. The `r max[,1]` cohort has the largest percentage of part-time employees remaining at `r max[,2]` and the `r min[,1]` cohort has the least part-time employees remaining at `r min[,2]`.
@@ -148,7 +151,7 @@ Next we see Figure #3 which displays the percent of employees that remain over t
 
   line_t<-ggplot(data=count_l, aes(x=count_l$Month, y=count_l$Percent_Still_Employee, group=count_l$cohort)) + xlab("Month Number") +
     ylab("Percent Still Employee") +  geom_line(aes(color=count_l$cohort)) + geom_vline(xintercept = 106, linetype="dashed") + theme_light() + 
-    scale_color_discrete(name="Legend") + scale_x_continuous(breaks=seq(101, 112,1)) + ggtitle("Figure #3 Percent Fiancés Remaining After Each Period by Cohort")
+    scale_color_discrete(name="Legend") + scale_x_continuous(breaks=seq(101, 112,1)) + ggtitle("Figure #3 Percent Employees Remaining After Each Period by Cohort")
   plot(line_t)
 ```
 
