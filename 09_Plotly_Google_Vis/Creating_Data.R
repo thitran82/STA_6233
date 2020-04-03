@@ -1,6 +1,5 @@
 library(googleVis)
 library(tidyr)
-library(gridExtra)
 library(dplyr)
 library(scales)
 
@@ -33,36 +32,54 @@ j<-as.data.frame(table(all_cohorts$trans))
   t<-plyr::rename(t, c("Group.1"="Transition Type", "x"="Frequency"))
   t<-t[order(-t$Frequency),]
 
-#Add a total Column to cnts_trans
-for(i in 1:12){
-  eval(parse(text=paste0('count$Month_', i,'<-as.numeric(count$Month_', i,')')))
-}
+#Add a total Column to count
 count$Total<-rowSums(count[2:13])
 
 #Create a Survival Format
-c<-cnts_trans$Total
-for(i in 1:1){
-  eval(parse(text=paste0('cnts_trans$ms_', i-1, '<-c')))
-  for(k in 1:12){
-    eval(parse(text=paste0('cnts_trans$ms_', k, '<-(cnts_trans$ms_', k-1, ' - cnts_trans$Month_', k, ')')))
+c<-count$Total
+  #Create a How many part-time employees remain after end of month
+  for(i in 1:1){
+    eval(parse(text=paste0('count$ms_', i-1, '<-c')))
+    for(k in 1:12){
+      eval(parse(text=paste0('count$ms_', k, '<-(count$ms_', k-1, ' - count$Month_', k, ')')))
+    }
   }
-}
-for(k in 1:12){
-  eval(parse(text=paste0('cnts_trans$Percent_Left_in_Month_', k,'<-round(as.numeric(cnts_trans$Month_', k,'/cnts_trans$Total)*100,2)')))
-}
-for(k in 1:12){
-  eval(parse(text=paste0('cnts_trans$Percent_Remain_in_Month_', k,'<-round(as.numeric(cnts_trans$ms_', k-1,'/cnts_trans$Total)*100,2)')))
-}
+  #What Percent of total that became full-time at end of month
+  for(k in 1:12){
+    eval(parse(text=paste0('count$Percent_Left_in_Month_', k,'<-round(as.numeric(count$Month_', k,'/count$Total)*100,2)')))
+  }
+  #What percent remain as non full-time at end of month
+  for(k in 1:12){
+    eval(parse(text=paste0('count$Percent_Remain_in_Month_', k,'<-round(as.numeric(count$ms_', k-1,'/count$Total)*100,2)')))
+  }
 
 #Now Make this data long
-tout<- cnts_trans[1:14] %>% gather(Month_Code, No_Longer_Fiance, Month_1:Month_12)
-tout_p<- cnts_trans[28:39] %>% gather(Month_Code, Percent_No_Longer_Fiance, Percent_Left_in_Month_1:Percent_Left_in_Month_12)
-survive<-cnts_trans[13:26] %>% gather(time_survive, Still_Fiance, ms_0:ms_11)
-survive_p<-cnts_trans[40:51] %>% gather(time_survive, Percent_Still_Fiance, Percent_Remain_in_Month_1:Percent_Remain_in_Month_12)
-cnts_trans_l<-cbind(tout[c(1:2,4)], tout_p[2], survive[4], survive_p[2])
-cnts_trans_l$Month<-with(cnts_trans_l, ave(cnts_trans_l$cohort, cnts_trans_l$cohort, FUN=seq_along)) %>% as.numeric()
-cnts_trans_l$Month<-cnts_trans_l$Month + 100
+  tout<- count[2:15] %>% gather(Month_Code, No_Longer_Employee, Month_1:Month_12)
+  tout_p<- count[29:40] %>% gather(Month_Code, Percent_No_Longer_Employee, Percent_Left_in_Month_1:Percent_Left_in_Month_12)
+  survive<-count[14:27] %>% gather(time_survive, Still_Employee, ms_0:ms_11)
+  survive_p<-count[41:52] %>% gather(time_survive, Percent_Still_Employee, Percent_Remain_in_Month_1:Percent_Remain_in_Month_12)
+  count_l<-cbind(tout[c(1:2,4)], tout_p[2], survive[4], survive_p[2])
+  count_l$Month<-with(count_l, ave(as.character(count_l$cohort), as.character(count_l$cohort), FUN=seq_along)) %>% as.numeric()
+  count_l$Month<-count_l$Month + 100 #Adding 100 so that it remains in order as 1, 11, 12, 2 will be order without this
 
+  all_sum1<-mean(count$Total)
+  all_sum2<-mean(all_cohorts$count)
+  tot_cnt<-sum(count$Total)
+  
+  #Reorder Factor Levels
+  count$fl<-ifelse(count$cohort=="17-Jan", 1, ifelse(count$cohort=="17-Feb", 2, ifelse(count$cohort=="17-Mar", 3,
+    ifelse(count$cohort=="17-Apr", 4, ifelse(count$cohort=="17-May", 5, ifelse(count$cohort=="17-Jun", 6, ifelse(count$cohort=="17-Jul", 7,
+    ifelse(count$cohort=="17-Aug", 8, ifelse(count$cohort=="17-Sep", 9, ifelse(count$cohort=="17-Oct", 10, ifelse(count$cohort=="17-Nov", 11,
+    ifelse(count$cohort=="17-Dec", 12, NA))))))))))))
+  count$cohort<-factor(count$cohort, levels=count$cohort[order(count$fl)])
+  
+  count_l$fl<-ifelse(count_l$cohort=="17-Jan", 1, ifelse(count_l$cohort=="17-Feb", 2, ifelse(count_l$cohort=="17-Mar", 3,
+    ifelse(count_l$cohort=="17-Apr", 4, ifelse(count_l$cohort=="17-May", 5, ifelse(count_l$cohort=="17-Jun", 6, ifelse(count_l$cohort=="17-Jul", 7,
+    ifelse(count_l$cohort=="17-Aug", 8, ifelse(count_l$cohort=="17-Sep", 9, ifelse(count_l$cohort=="17-Oct", 10, ifelse(count_l$cohort=="17-Nov", 11,
+    ifelse(count_l$cohort=="17-Dec", 12, NA))))))))))))
+
+  #count_l$cohort<-factor(count_l$cohort, levels=count_l$cohort[order(count_l$fl)])
+  
 #Create Visualizations  
 myStateSettings_time<-'
   {"yZoomedIn":false,"time":"101","sizeOption":"_UNISIZE","orderedByY":false,"yZoomedDataMax":4000,"nonSelectedAlpha":0.4,"orderedByX":true,"iconKeySettings":[],
@@ -70,56 +87,43 @@ myStateSettings_time<-'
   "yZoomedDataMin":0,"iconType":"VBAR","colorOption":"_UNIQUE_COLOR", "duration":{"multiplier":1,"timeUnit":"Y"},"playDuration":15088.88888888889,
   "xAxisOption":"_ALPHABETICAL","xZoomedIn":false,"xZoomedDataMin":0}
   '
-m_reg<-gvisMotionChart(cnts_trans_l[1:132,c(1:4,7)], idvar="cohort", timevar = "Month")
-m_time<-gvisMotionChart(cnts_trans_l[,c(1:2, 5:7)], idvar="cohort", timevar = "Month", options=list(state=myStateSettings_time))
+m_reg<-gvisMotionChart(count_l[1:132,c(1:4,7)], idvar="cohort", timevar = "Month")
+m_time<-gvisMotionChart(count_l[,c(1:2, 5:7)], idvar="cohort", timevar = "Month", options=list(state=myStateSettings_time))
 plot(m_reg)  
 plot(m_time)
 
-#Reorder Factor Levels
-cnts_trans$fl<-ifelse(cnts_trans$cohort=="Jan17", 1, ifelse(cnts_trans$cohort=="Feb17", 2, ifelse(cnts_trans$cohort=="March17", 3,
-                                                                                                  ifelse(cnts_trans$cohort=="Apr17", 4, ifelse(cnts_trans$cohort=="May17", 5, ifelse(cnts_trans$cohort=="June17", 6, ifelse(cnts_trans$cohort=="July17", 7,
-                                                                                                                                                                                                                            ifelse(cnts_trans$cohort=="Aug17", 8, ifelse(cnts_trans$cohort=="Sep17", 9, ifelse(cnts_trans$cohort=="Oct17", 10, ifelse(cnts_trans$cohort=="Nov17", 11,
-                                                                                                                                                                                                                                                                                                                                                      ifelse(cnts_trans$cohort=="Dec17", 12, NA))))))))))))
-cnts_trans$cohort<-factor(cnts_trans$cohort, levels=cnts_trans$cohort[order(cnts_trans$fl)])
-
-cnts_trans_l$fl<-ifelse(cnts_trans_l$cohort=="Jan17", 1, ifelse(cnts_trans_l$cohort=="Feb17", 2, ifelse(cnts_trans_l$cohort=="March17", 3,
-                                                                                                        ifelse(cnts_trans_l$cohort=="Apr17", 4, ifelse(cnts_trans_l$cohort=="May17", 5, ifelse(cnts_trans_l$cohort=="June17", 6, ifelse(cnts_trans_l$cohort=="July17", 7,
-                                                                                                                                                                                                                                        ifelse(cnts_trans_l$cohort=="Aug17", 8, ifelse(cnts_trans_l$cohort=="Sep17", 9, ifelse(cnts_trans_l$cohort=="Oct17", 10, ifelse(cnts_trans_l$cohort=="Nov17", 11,
-                                                                                                                                                                                                                                                                                                                                                                        ifelse(cnts_trans_l$cohort=="Dec17", 12, NA))))))))))))
-cnts_trans_l$cohort<-factor(cnts_trans_l$cohort, levels=cnts_trans_l$cohort[order(cnts_trans_l$fl)])
-
 #Grab Only the 6th month
-six<-cnts_trans_l[61:72,c(1,6)]
-max<-subset(six, six$Percent_Still_Fiance==max(six$Percent_Still_Fiance))
-min<-subset(six, six$Percent_Still_Fiance==min(six$Percent_Still_Fiance))
+six<-count_l[61:72,c(1,6)]
+max<-subset(six, six$Percent_Still_Employee==max(six$Percent_Still_Employee))
+min<-subset(six, six$Percent_Still_Employee==min(six$Percent_Still_Employee))
 
-line_t<-ggplot(data=cnts_trans_l, aes(x=cnts_trans_l$Month, y=cnts_trans_l$Percent_Still_Fiance, group=cnts_trans_l$cohort)) + xlab("Month Number") +
-  ylab("Percent Still Fiance") +  geom_line(aes(color=cnts_trans_l$cohort)) + geom_vline(xintercept = 106, linetype="dashed") + theme_light() + 
+line_t<-ggplot(data=count_l, aes(x=count_l$Month, y=count_l$Percent_Still_Employee, group=count_l$cohort)) + xlab("Month Number") +
+  ylab("Percent Still Employee") +  geom_line(aes(color=count_l$cohort)) + geom_vline(xintercept = 106, linetype="dashed") + theme_light() + 
   scale_color_discrete(name="Legend") + scale_x_continuous(breaks=seq(101, 112,1)) + ggtitle("Percent Fiancés Remaining After Each Period by Cohort")
 plot(line_t)
 
-all_sum1<-mean(cnts_trans$Total)
-bar1<-ggplot(data=cnts_trans, aes(cnts_trans$cohort, fill=cnts_trans$cohort)) + geom_bar(aes(weight=cnts_trans$Total)) +  
-  scale_fill_manual(values=c("Apr17"="lightcyan3", "Aug17"="lightcyan4", "Dec17"="lightcyan3", "Feb17"="lightcyan4", "Jan17"="lightcyan3",
-                             "July17"="lightcyan4", "June17"="lightcyan3", "March17"="lightcyan4", "May17"="lightcyan3", "Nov17"="lightcyan4",
-                             "Oct17"="lightcyan3", "Sep17"="lightcyan4"), guide=F) + xlab("Cohort") + ylab("Total Fiancés") + theme_light() + 
+all_sum1<-mean(count$Total)
+bar1<-ggplot(data=count, aes(count$cohort, fill=count$cohort)) + geom_bar(aes(weight=count$Total)) +  
+  scale_fill_manual(values=c("17-Apr"="lightcyan3", "17-Aug"="lightcyan4", "17-Dec"="lightcyan3", "17-Feb"="lightcyan4", "17-Jan"="lightcyan3",
+                             "17-Jul"="lightcyan4", "17-Jun"="lightcyan3", "17-Mar"="lightcyan4", "17-May"="lightcyan3", "17-Nov"="lightcyan4",
+                             "17-Oct"="lightcyan3", "17-Sep"="lightcyan4"), guide=F) + xlab("Cohort") + ylab("Total Fiancés") + theme_light() + 
   scale_y_continuous(limits=c(0, 3500), oob=rescale_none) + geom_hline(yintercept = all_sum1, linetype="dashed", colour="indianred3") + 
-  geom_text(aes(x=cnts_trans$cohort, y=cnts_trans$Total, label=cnts_trans$Total), vjust=-1) + ggtitle("Total Number of Fiancés as Operators by Cohort") 
+  geom_text(aes(x=count$cohort, y=count$Total, label=count$Total), vjust=-1) + ggtitle("Total Number of Fiancés as Operators by Cohort") 
 plot(bar1)
 
 #Create new dataset with just the summary statistics
-sum_stats<-all_cohorts[,20:21] %>% group_by(cohort) %>% summarise_each(funs(mean(., na.rm = T), sd(., na.rm=T)))
-sum_stats$fl<-ifelse(sum_stats$cohort=="Jan17", 1, ifelse(sum_stats$cohort=="Feb17", 2, ifelse(sum_stats$cohort=="March17", 3,
-                                                                                               ifelse(sum_stats$cohort=="Apr17", 4, ifelse(sum_stats$cohort=="May17", 5, ifelse(sum_stats$cohort=="June17", 6, ifelse(sum_stats$cohort=="July17", 7,
-                                                                                                                                                                                                                      ifelse(sum_stats$cohort=="Aug17", 8, ifelse(sum_stats$cohort=="Sep17", 9, ifelse(sum_stats$cohort=="Oct17", 10, ifelse(sum_stats$cohort=="Nov17", 11,
-                                                                                                                                                                                                                                                                                                                                             ifelse(sum_stats$cohort=="Dec17", 12, NA))))))))))))
+sum_stats<-all_cohorts[,18:19] %>% group_by(cohort) %>% summarise_each(funs(mean(., na.rm = T), sd(., na.rm=T)))
+sum_stats$fl<-ifelse(sum_stats$cohort=="17-Jan", 1, ifelse(sum_stats$cohort=="17-Feb", 2, ifelse(sum_stats$cohort=="17-Mar", 3,
+  ifelse(sum_stats$cohort=="17-Apr", 4, ifelse(sum_stats$cohort=="17-May", 5, ifelse(sum_stats$cohort=="17-Jun", 6, ifelse(sum_stats$cohort=="17-Jul", 7,
+  ifelse(sum_stats$cohort=="17-Aug", 8, ifelse(sum_stats$cohort=="17-Sep", 9, ifelse(sum_stats$cohort=="17-Oct", 10, ifelse(sum_stats$cohort=="17-Nov", 11,
+  ifelse(sum_stats$cohort=="17-Dec", 12, NA))))))))))))
 sum_stats$cohort<-factor(sum_stats$cohort, levels=sum_stats$cohort[order(sum_stats$fl)])
 
 all_sum2<-mean(all_cohorts$count)
 bar2<-ggplot(data=sum_stats, aes(sum_stats$cohort, fill=sum_stats$cohort)) + geom_bar(aes(weight=sum_stats$mean)) +  
-  scale_fill_manual(values=c("Apr17"="lightcyan3", "Aug17"="lightcyan4", "Dec17"="lightcyan3", "Feb17"="lightcyan4", "Jan17"="lightcyan3",
-                             "July17"="lightcyan4", "June17"="lightcyan3", "March17"="lightcyan4", "May17"="lightcyan3", "Nov17"="lightcyan4",
-                             "Oct17"="lightcyan3", "Sep17"="lightcyan4"), guide=F) + xlab("Cohort") + ylab("Average Months") + theme_light() + 
+  scale_fill_manual(values=c("17-Apr"="lightcyan3", "17-Aug"="lightcyan4", "17-Dec"="lightcyan3", "17-Feb"="lightcyan4", "17-Jan"="lightcyan3",
+                             "17-Jul"="lightcyan4", "17-Jun"="lightcyan3", "17-Mar"="lightcyan4", "17-May"="lightcyan3", "17-Nov"="lightcyan4",
+                             "17-Oct"="lightcyan3", "17-Sep"="lightcyan4"), guide=F) + xlab("Cohort") + ylab("Average Months") + theme_light() + 
   scale_y_continuous(limits=c(8.25,9.25), oob=rescale_none) + geom_hline(yintercept = all_sum2, linetype="dashed", colour="indianred3") + 
   geom_text(aes(x=sum_stats$cohort, y=sum_stats$mean, label=round(sum_stats$mean,2)), vjust=-1) + ggtitle("Average Months Fiancés Remain by Cohort") 
 plot(bar2)
