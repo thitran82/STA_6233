@@ -4,53 +4,40 @@ library(gridExtra)
 library(dplyr)
 library(scales)
 
-#Set Up for Changing Number to Date
-nums<-c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26)
-Month<-c("Dec16", "Jan17", "Feb17", "March17", "Apr17", "May17", "June17", "July17", "Aug17", "Sep17", "Oct17", "Nov17", "Dec17",
-         "Jan18", "Feb18", "March18", "Apr18", "May18", "June18", "July18", "Aug18", "Sep18", "Oct18", "Nov18", "Dec18", "Jan19")
-cnts_trans<-data.frame(Month_1=numeric(), Month_2=numeric(), Month_3=numeric(), Month_4=numeric(), Month_5=numeric(), Month_6=numeric()
-                       , Month_7=numeric(), Month_8=numeric(), Month_9=numeric(), Month_10=numeric(), Month_11=numeric(), Month_12=numeric(), cohort=character())
-
 #Bring in Data
 all_cohorts<-read.csv("https://raw.githubusercontent.com/mattdemography/STA_6233/master/Data/all_cohorts.csv")
 count<-read.csv("https://raw.githubusercontent.com/mattdemography/STA_6233/master/Data/cohort_counts.csv")
 
 #Find All Possible Transitions
-#Make Changes to  
-caps<-names(all_cohorts[2:14])
-caps_l<-names(all_cohorts[3:15])
+
+caps<-names(all_cohorts[1:13])
+caps_l<-names(all_cohorts[2:14]) #Lag Previous Variable
 j<-as.data.frame(table(all_cohorts$trans))
 
 #Label these transitions
-d<-NULL
-for(i in 1:length(caps_l)){
-  eval(parse(text=paste0('d_', i,'<-unique(all_cohorts$', caps_l[i],')')))
-  d<-append(d, eval(parse(text=paste0('d_', i))))
-  do.call("rm", list(paste0('d_', i))) #Removes datasets created as a result of loop
-}
-d<-unique(d)
-
-#Create list to change to
-cap_num<-c("13", "15", "19", "21", "25", "31", "33", "37", "39", "42", "46", "47", "48", "49", "51", "73", "3", "4", "5", "6", "7")
-cap_name<-c("Friend ->", "Fiance ->",  "Ex-Spouse ->", "Unknown ->",  "Son/Daughter-In-Law ->", "Babysitter ->", "Cousin ->", "Widow/er ->", "Unknown ->", 
-            "Deceased-Spouse ->", "Ex-Fiance ->", "Caretaker ->", "Cohabitant ->", "Ex-Cohabitant ->", "Business-Partner ->", "Deceased-Cohabitant ->", 
-            "Spouse ->", "Child ->", "Step-Child ->", "Brother/Sister ->", "Bro/Sis-In-Law ->")
+  #Create list to change to
+  cap_num<-c("13", "15", "19", "21", "25", "31", "33", "37", "39", "42", "46", "47", "48", "49", "51", "73", "3", "4", "5", "6", "7")
+  cap_name<-c("Non-Exempt ->", "Part-Time ->",  "Ex-Employee ->", "Unknown ->",  "Temp-Employee ->", "Temp-Employee ->", "Intern ->", "Intern ->", "Unknown ->", 
+              "Deceased-Employee ->", "Ex-Employee ->", "Outsourced ->", "Temp ->", "Ex-Temp ->", "Business-Partner ->", "Deceased-Temp ->", 
+              "Full-Time ->", "Unknown ->", "Ex-Intern ->", "Family ->", "Ex-Employee ->")
 #Create Loop
-j$name<-j$Var1
-for(s in 1:length(cap_num)){
-  j$name<-gsub(cap_num[s], cap_name[s], j$name)
-}
-j$unique_name<-vapply(strsplit(j$name, " "), function(x) paste(unique(x), collapse = " "), character(1L)) 
+  j$name<-j$Var1 #Create Copy
+  for(s in 1:length(cap_num)){
+    j$name<-gsub(cap_num[s], cap_name[s], j$name) #Use Regular Expression to take what is in cap_num and put cap_name instead
+  }
+  #Eliminate all same-state non-transition months
+  j$unique_name<-vapply(strsplit(j$name, " "), function(x) paste(unique(x), collapse = " "), character(1L)) 
+  
 #Get All Unique Transitions overall and how often it occurs
-t<-aggregate(j$Freq, by=list(j$unique_name), FUN=sum)
-t<-plyr::rename(t, c("Group.1"="Transition Type", "x"="Frequency"))
-t<-t[order(-t$Frequency),]
+  t<-aggregate(j$Freq, by=list(j$unique_name), FUN=sum)
+  t<-plyr::rename(t, c("Group.1"="Transition Type", "x"="Frequency"))
+  t<-t[order(-t$Frequency),]
 
 #Add a total Column to cnts_trans
 for(i in 1:12){
-  eval(parse(text=paste0('cnts_trans$Month_', i,'<-as.numeric(cnts_trans$Month_', i,')')))
+  eval(parse(text=paste0('count$Month_', i,'<-as.numeric(count$Month_', i,')')))
 }
-cnts_trans$Total<-rowSums(cnts_trans[1:12])
+count$Total<-rowSums(count[2:13])
 
 #Create a Survival Format
 c<-cnts_trans$Total

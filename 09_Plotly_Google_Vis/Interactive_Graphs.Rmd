@@ -27,15 +27,6 @@ Next, I discuss the results of this assessment.
 
 ```{r data_clean, echo=FALSE, include=FALSE}
 
-
-#Set Up for Changing Number to Date
-nums<-c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26)
-Month<-c("Dec16", "Jan17", "Feb17", "March17", "Apr17", "May17", "June17", "July17", "Aug17", "Sep17", "Oct17", "Nov17", "Dec17",
-         "Jan18", "Feb18", "March18", "Apr18", "May18", "June18", "July18", "Aug18", "Sep18", "Oct18", "Nov18", "Dec18", "Jan19")
-cnts_trans<-data.frame(Month_1=numeric(), Month_2=numeric(), Month_3=numeric(), Month_4=numeric(), Month_5=numeric(), Month_6=numeric()
-                       , Month_7=numeric(), Month_8=numeric(), Month_9=numeric(), Month_10=numeric(), Month_11=numeric(), Month_12=numeric(), cohort=character())
-all_cohorts_list<-list() #Create Empty dataset to bind all addresses to.
-
 #Read in Data
   all_cohorts<-read.csv(file=paste0("~/Ad_hocs/Fiances/all_cohorts.csv"), stringsAsFactors=F)
   cnts_trans<-read.csv(file=paste0("~/Ad_hocs/Fiances/cohort_counts.csv"), stringsAsFactors=F)
