@@ -1,0 +1,29 @@
+---
+title: "Creating_Shiny_Apps"
+author: "Matthew Martinez"
+date: "4/9/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Shiny Basics
+
+What is a Shiny app? Well, think of Shiny apps as light applets that allow you to create interactive visualizations of your data in real-time. Shiny apps allow end-users to manipulate tables and graphs, currate new data, filter data for new visualizations, and a host of other items that put the data story in the hands of users. You can find some great examples of [Shiny apps here](https://shiny.rstudio.com/gallery/). I have some personal apps that I created for demonstration purposes as well.
+
+At the end of these few weeks you will be able to [deploy](https://www.shinyapps.io/) a live app that can be viewed on your computer, phone, tablet, or other internet device. 
+
+library(shiny) - This brings in the library.
+ui <- fluidPage() - This is the ui for the applicaton
+
+server <- function(input, output) {}
+
+shinyApp(ui = ui, server = server)
+
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
