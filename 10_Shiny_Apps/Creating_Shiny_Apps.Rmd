@@ -24,7 +24,7 @@ library(shiny) - This brings in the library.
 ui <- fluidPage() - This is the user interface for the application. It controls the layout and appearance of the application.
 
 **The Server Instructions**  
-server <- function(input, output) {}
+server <- function(input, output) {} - The server function tells the app how to be built and operate.
 
 **The App**  
 shinyApp(ui = ui, server = server) - This knits the two components together.
@@ -38,26 +38,36 @@ You start building a shiny app by clicking *File -> New File -> Shiny Web App* a
 ```{r pressure, echo=TRUE}
 #Load the Library
 library(shiny)
+library(ggplot2)
+t<-read.csv("./Data/nic-cage.csv", stringsAsFactors = F)
+t$RottenTomatoes<-as.numeric(t$RottenTomatoes)
+t$Years<-as.numeric(t$Years)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
 
     # Application title
-    titlePanel("Old Faithful Geyser Data"),
+    titlePanel("Nicolas Cage \"American Hero\" Data"),
 
-    # Sidebar with a slider input for number of bins 
+    # Sidebar layout
     sidebarLayout(
+        #Inputs: Select which inputs from the data we want to display
         sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
+            #Select variable for y-axis
+                  selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("RottenTomatoes"), 
+                  selected = "Rating"),
+            #Select X-axix variables
+                  selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("Voice", "Year"), 
+                  selected = "Year")
         ),
 
-        # Show a plot of the generated distribution
+        #Output: Type of plot
         mainPanel(
-           plotOutput("distPlot")
+           plotOutput(outputId = "FreqTab") #Any name can go where "FreqTab" is, but be sure to keep it consistent with name in output$FreqTab in the server section
         )
     )
 )
@@ -65,13 +75,9 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
+    output$FreqTab <- renderPlot({
         # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white')
+        hist(data=t, x, col = 'darkgray', border = 'white')
     })
 }
 
@@ -81,6 +87,9 @@ shinyApp(ui = ui, server = server)
 ```
 
 Let's take a closer look at this simple app by first examining the user interface portion of the code.
+
+ggplot(t, aes_string(x=t$Voice, y=t$Rating))
+
 
 > ui <- fluidPage(  
 >    titlePanel("Old Faithful Geyser Data"),  
