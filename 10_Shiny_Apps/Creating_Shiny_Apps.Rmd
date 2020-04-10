@@ -12,16 +12,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Shiny Basics
 
-What is a Shiny app? Well, think of Shiny apps as light applets that allow you to create interactive visualizations of your data in real-time. Shiny apps allow end-users to manipulate tables and graphs, currate new data, filter data for new visualizations, and a host of other items that put the data story in the hands of users. You can find some great examples of [Shiny apps here](https://shiny.rstudio.com/gallery/). I have some personal apps that I created for [demonstration purposes](https://matthew-j-martinez.shinyapps.io/Organizations_Test_Data/) as well.
+What is a Shiny app? Well, think of Shiny apps as light applets that allow you to create interactive visualizations of your data in real-time. Shiny apps allow end-users to manipulate tables and graphs, curate new data, filter data for new visualizations, and a host of other items that put the data story in the hands of users. You can find some great examples of [Shiny apps here](https://shiny.rstudio.com/gallery/). I have some personal apps that I created for [demonstration purposes](https://matthew-j-martinez.shinyapps.io/Organizations_Test_Data/) as well. It may be helpful to refer to the following resources while developing shiny apps including the [Shiny Cheatsheet](https://shiny.rstudio.com/images/shiny-cheatsheet.pdf), this [tutorial](https://shiny.rstudio.com/tutorial/), these [Shiny instructional videos](https://resources.rstudio.com/shiny-2), and especially this [Shiny workshop](https://github.com/mattdemography/shinymark) by Daniel Kaplan which was heavily referenced in the creation of this lesson.
 
-At the end of these few weeks you will be able to [deploy](https://www.shinyapps.io/) a live app that can be viewed on your computer, phone, tablet, or other internet device. You will need to create a user account with https://www.shinyapps.io/ in order to deploy and share your Shiny app. You can use your github account or google account as well to speed up registration and logging in. You do not have to deploy a Shiny app to view it as you can host the app on your local computer. If you desire others to view and interact with your app then you will need to deploy it.  
+At the end of these few weeks you will be able to [deploy](https://www.shinyapps.io/) a live app that can be viewed on your computer, phone, tablet, or other internet device. You will need to create a user account with https://www.shinyapps.io/ in order to deploy and share your Shiny app. You can use your Github account or Google account as well to speed up registration and logging in. You do not have to deploy a Shiny app to view it as you can host the app on your local computer. If you desire others to view and interact with your app then you will need to deploy it.  
 
-#### Shiny App Components
+#### **Shiny App Components**  
 **The Library**  
 library(shiny) - This brings in the library.
 
 **The User Interface (ui)**  
-ui <- fluidPage() - This is the user interface for the applicaton
+ui <- fluidPage() - This is the user interface for the application. It controls the layout and appearance of the application.
 
 **The Server Instructions**  
 server <- function(input, output) {}
@@ -29,9 +29,9 @@ server <- function(input, output) {}
 **The App**  
 shinyApp(ui = ui, server = server) - This knits the two components together.
 
-All shiny apps will have this very basic template. They obviously will be much more detailed as you build your app, but these components are neccessary for your app to properly function.
+All shiny apps will have this very basic template. They obviously will be much more detailed as you build your app, but these components are necessary for your app to properly function.
 
-#### Starting a Shiny App  
+#### **Starting a Shiny App**  
 You start building a shiny app by clicking *File -> New File -> Shiny Web App* and choosing a name for the application. The code below creates the attached application. We will then go through each section so that you can better understand the app components.
 
 
@@ -80,3 +80,22 @@ shinyApp(ui = ui, server = server)
 
 ```
 
+Let's take a closer look at this simple app by first examining the user interface portion of the code.
+
+> ui <- fluidPage(  
+>    titlePanel("Old Faithful Geyser Data"),  
+>    # Sidebar with a slider input for number of bins 
+>    sidebarLayout(
+>        sidebarPanel(
+>            sliderInput("bins",
+>                        "Number of bins:",
+>                        min = 1,
+>                        max = 50,
+>                        value = 30)
+>        ),
+>    # Show a plot of the generated distribution
+>        mainPanel(
+>           plotOutput("distPlot")
+>        )
+>    )
+>)
