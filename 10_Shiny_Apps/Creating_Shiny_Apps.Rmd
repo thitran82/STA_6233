@@ -35,17 +35,17 @@ All shiny apps will have this very basic template. They obviously will be much m
 You start building a shiny app by clicking *File -> New File -> Shiny Web App* and choosing a name for the application. The code below creates the attached application. We will then go through each section so that you can better understand the app components.
 
 
-```{r pressure, echo=TRUE}
+```{r nick, echo=TRUE}
 #Load the Library
 library(shiny)
 library(ggplot2)
-load("./Data/nic-cage.RDS")
+load(url("https://raw.githubusercontent.com/mattdemography/STA_6233/master/Data/nic-cage.RData"))
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
 
     # Application title
-    titlePanel("Nicolas Cage \"American Hero\" Data"),
+    titlePanel("Nicolas Cage \"American Hero\""),
 
     # Sidebar layout
     sidebarLayout(
@@ -75,7 +75,7 @@ server <- function(input, output) {
 
     output$FreqTab <- renderPlot({
         # draw the histogram with the specified number of bins
-        hist(data=t, x, col = 'darkgray', border = 'white')
+      ggplot(t, aes_string(x=input$x, y=input$y)) + geom_point() #Notice the difference between the ggplots
     })
 }
 
@@ -83,26 +83,47 @@ server <- function(input, output) {
 shinyApp(ui = ui, server = server)
 
 ```
+  
+Let's take a closer look at this simple app. First notice that we bring in two different libraries and load a dataset of the format 'RData' from github. Loading .csv directly does not work in the shiny enviornment. You will need to either 1) host the data remotely via a cloud service as I am here, 2) you will need to create a data folder inside of your Shiny app folder and load a .RData file or .rds file, or 3) load the data into the script itself like the template example that appears when you start your first shiny app using RStudio.
 
-Let's take a closer look at this simple app by first examining the user interface portion of the code.
+```{r libs, eval=FALSE}
 
+#Load the Library
+library(shiny)
+library(ggplot2)
+load(url("https://raw.githubusercontent.com/mattdemography/STA_6233/master/Data/nic-cage.RData"))
+```
+
+#### Examining the UI
+  
+The ui begins with the *fluidePage()* function and includes items like the shiny app title, and the types of interactives you desire to have in the app. Next we see the *titlePanel()* function which applies a large title to your Shiny app. This element is not necessary, but often used.
+```{r ui, eval=FALSE}
+
+ui <- fluidPage(
+
+    # Application title
+    titlePanel("Nicolas Cage \"American Hero\""),
+```    
+Now, we move onto the  
+
+```{r ui2, eval=FALSE}    
+# Sidebar layout
+    sidebarLayout(
+        #Inputs: Select which inputs from the data we want to display
+        sidebarPanel(
+            #Select variable for y-axis
+                  selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("RottenTomatoes"), 
+                  selected = "Rating"),
+            #Select X-axix variables
+                  selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("Voice", "Year"), 
+                  selected = "Year")
+        ),
+```
 ggplot(t, aes_string(x=t$Voice, y=t$Rating))
 
 
-> ui <- fluidPage(  
->    titlePanel("Old Faithful Geyser Data"),  
->    # Sidebar with a slider input for number of bins 
->    sidebarLayout(
->        sidebarPanel(
->            sliderInput("bins",
->                        "Number of bins:",
->                        min = 1,
->                        max = 50,
->                        value = 30)
->        ),
->    # Show a plot of the generated distribution
->        mainPanel(
->           plotOutput("distPlot")
->        )
->    )
->)
+
