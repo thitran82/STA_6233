@@ -84,6 +84,7 @@ server <- function(input, output) {
 shinyApp(ui = ui, server = server)
 
 ```
+  
 #### **Setting up the App **  
 
 Let's take a closer look at this simple app. First notice that we bring in two different libraries and load a dataset of the format 'RData' from github. Loading .csv directly does not work in the shiny environment. You will need to either 1) host the data remotely via a cloud service as I am here, 2) you will need to create a data folder inside of your Shiny app folder and load a .RData file or .rds file, or 3) load the data into the script itself like the template example that appears when you start your first shiny app using RStudio.
@@ -98,7 +99,7 @@ load(url("https://raw.githubusercontent.com/mattdemography/STA_6233/master/Data/
   
 #### **Examining the UI**
   
-The **ui** begins with the *fluidePage()* function and includes items like the shiny app title, and the types of interactives you desire to have in the app. Next we see the *titlePanel()* function which applies a large title to your Shiny app. This element is not necessary, but often used.
+The **ui** begins with the *fluidPage()* function and includes items like the shiny app title, and the types of interactives you desire to have in the app. Next we see the *titlePanel()* function which applies a large title to your Shiny app. This element is not necessary, but often used.
 
 ```{r ui, eval=FALSE}
 
