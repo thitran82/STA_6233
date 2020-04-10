@@ -84,7 +84,7 @@ shinyApp(ui = ui, server = server)
 
 ```
   
-Let's take a closer look at this simple app. First notice that we bring in two different libraries and load a dataset of the format 'RData' from github. Loading .csv directly does not work in the shiny enviornment. You will need to either 1) host the data remotely via a cloud service as I am here, 2) you will need to create a data folder inside of your Shiny app folder and load a .RData file or .rds file, or 3) load the data into the script itself like the template example that appears when you start your first shiny app using RStudio.
+Let's take a closer look at this simple app. First notice that we bring in two different libraries and load a dataset of the format 'RData' from github. Loading .csv directly does not work in the shiny environment. You will need to either 1) host the data remotely via a cloud service as I am here, 2) you will need to create a data folder inside of your Shiny app folder and load a .RData file or .rds file, or 3) load the data into the script itself like the template example that appears when you start your first shiny app using RStudio.
 
 ```{r libs, eval=FALSE}
 
@@ -93,10 +93,11 @@ library(shiny)
 library(ggplot2)
 load(url("https://raw.githubusercontent.com/mattdemography/STA_6233/master/Data/nic-cage.RData"))
 ```
-
-#### Examining the UI
   
-The ui begins with the *fluidePage()* function and includes items like the shiny app title, and the types of interactives you desire to have in the app. Next we see the *titlePanel()* function which applies a large title to your Shiny app. This element is not necessary, but often used.
+#### **Examining the UI**
+  
+The **ui** begins with the *fluidePage()* function and includes items like the shiny app title, and the types of interactives you desire to have in the app. Next we see the *titlePanel()* function which applies a large title to your Shiny app. This element is not necessary, but often used.
+
 ```{r ui, eval=FALSE}
 
 ui <- fluidPage(
@@ -104,7 +105,8 @@ ui <- fluidPage(
     # Application title
     titlePanel("Nicolas Cage \"American Hero\""),
 ```    
-Now, we move onto the  
+  
+Now we see that we setup the app to have a sidebar and a main panel area. The sidebar will contain two input options - one being the Y-axis and the other being the X-axis for the ggplot made in the **server** portion of the Shiny code. The options for the user in the y-axis will be 'RottenTomatoes' and the default option will be 'RottenTomatoes'. The options for the user in the x-axis will be 'Voice' and 'Year' with the default set to 'Year'. Another important item to note in the *sidebarPanel()* function is the use of 'selectInput(inputID="y")' and selectInput(inputID="x"). This 'y' and 'x' inputID will link to the formation of the ggplot found in the **server** portion of the code as we will see later. 
 
 ```{r ui2, eval=FALSE}    
 # Sidebar layout
@@ -115,7 +117,7 @@ Now, we move onto the
                   selectInput(inputId = "y", 
                   label = "Y-axis:",
                   choices = c("RottenTomatoes"), 
-                  selected = "Rating"),
+                  selected = "RottenTomatoes"),
             #Select X-axix variables
                   selectInput(inputId = "x", 
                   label = "X-axis:",
@@ -123,7 +125,31 @@ Now, we move onto the
                   selected = "Year")
         ),
 ```
-ggplot(t, aes_string(x=t$Voice, y=t$Rating))
+
+The mainPanel contains the output of the selections in the sidebarPanel. In this case I am calling this "FreqTab" and this will be referenced in the **server** portion of the code. This name can be anything as long as you keeep it consistent in your future references.
+
+```{r ui3 eval=FALSE}
+#Output: Type of plot
+        mainPanel(
+           plotOutput(outputId = "FreqTab") #Any name can go where "FreqTab" is, but be sure to keep it consistent with name in output$FreqTab in the server section
+        )
+    )
+```
+  
+#### **Exploring the Server**
+  
+In the **server** portion of the Shiny app we see a *function()* with two arguments: 'input' and 'output'. First notice 'output$FreqTab' is a reactive plot (using function *renderPlot()*) with the 'FreqTab' name used in the mainPanel section above. Now let's examine the type of reactive plot that will be displayed in the mainPanel section of the app. It is a familiar function *ggplot()* except it is a bit different than we are used to seeing. If I were making this plot outside of a reactive plot I would probably show something like this
+`ggplot(t, aes_string(x=t$Voice, y=t$RottenTomatoes))` for a scatter plot of Rotten Tomatoes ratings by the dichotomous 'Voice' variable or `ggplot(t, aes_string(x=t$Year, y=t$RottenTomatoes))` for a scatter plot of Rotten Tomatoes ratings by the continuous 'Year' variable.
+```{r server eval=FALSE}
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+
+    output$FreqTab <- renderPlot({
+        # draw the histogram with the specified number of bins
+      ggplot(t, aes_string(x=input$x, y=input$y)) + geom_point() #Notice the difference between the ggplots
+    })
+}
+```
 
 
 
