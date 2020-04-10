@@ -39,9 +39,7 @@ You start building a shiny app by clicking *File -> New File -> Shiny Web App* a
 #Load the Library
 library(shiny)
 library(ggplot2)
-t<-read.csv("./Data/nic-cage.csv", stringsAsFactors = F)
-t$RottenTomatoes<-as.numeric(t$RottenTomatoes)
-t$Years<-as.numeric(t$Years)
+load("./Data/nic-cage.RDS")
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
