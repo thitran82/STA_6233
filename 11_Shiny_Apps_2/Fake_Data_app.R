@@ -2,9 +2,9 @@ library(shiny)
 library(tidyverse)
 library(scales)
 library(plotly)
-load("https://raw.githubusercontent.com/mattdemography/STA_6233/master/Data/fake_data.RData")
+load(url("https://raw.githubusercontent.com/mattdemography/STA_6233/master/Data/fake_data.RData"))
 
-# Define UI for application that plots features of fake data -----------
+#### Define UI for application that plots features of fake data ----------- ####
 ui <- fluidPage(
   # Sidebar layout with a input and output definitions --------------
   sidebarLayout(
